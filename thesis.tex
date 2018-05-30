@@ -1,0 +1,70 @@
+\documentclass[svgnames]{uvamscse} %Add xcolor parameter here to prevent conflict.
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{paralist}
+\usepackage{longtable}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{csquotes}
+\usepackage{xcolor}
+\usepackage{framed}
+\usepackage{listings}
+\usepackage[backend=biber,style=numeric]{biblatex}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage{pgfgantt}
+\usepackage{hyperref}
+\usepackage[toc,acronym,nogroupskip,nohypertypes={acronym}]{glossaries}
+
+\colorlet{shadecolor}{yellow}
+
+%Title page
+\title{Improving management and maintainability of virtual container networks through CNI}
+\author{Willem Jan Glerum 11317493}
+\authemail{wjglerum@gmail.com}
+\host{Lunatech}
+\supervisor{Paola Grosso\ --\ UvA}
+\date{\today}
+
+\abstract{
+  This section summarises the content of the thesis for potential readers who do not have time to read it whole,
+  or for those undecided whether to read it at all. Sum up the following aspects:
+
+  \begin{itemize}
+    \item relevance and motivation for the research
+    \item research questions and a brief description of the research method
+    \item results, contributions and conclusions
+  \end{itemize}
+}
+
+%Styles for the lstlisting blocks.
+%\input{lststyles}
+
+%Glossary register:
+%\input{glossaries}
+
+%Bibliography DB
+\addbibresource{refs.bib}
+
+%Useful definitions for (long)tables:
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}p{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}p{#1}}
+
+\begin{document}
+
+\maketitle
+%\include{chapters/introduction}
+%\include{chapters/conclusion}
+
+\clearpage
+\printbibliography{}
+
+\appendix%
+\glsresetall%  Reset acronym tracking. (so reintroduce as "Full (ACR)" in appendices).
+
+%\include{appendices/literature}
+
+\end{document}
+% vim: spell spelllang=en_gb 
