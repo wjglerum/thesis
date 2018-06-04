@@ -21,11 +21,13 @@
 
 %Title page
 \title{Improving management and maintainability of virtual container networks through CNI}
-\author{Willem Jan Glerum 11317493}
+\author{Willem Jan Glerum - 11317493}
 \authemail{wjglerum@gmail.com}
-\host{Lunatech}
+\host{Lunatech Labs B.V. \url{https://lunatech.com} }
 \supervisor{Paola Grosso\ --\ UvA}
 \date{\today}
+%Random virtual network image
+\coverpic[200pt]{images/virtual.png}
 
 \abstract{
   This section summarises the content of the thesis for potential readers who do not have time to read it whole,
@@ -42,7 +44,7 @@
 %\input{lststyles}
 
 %Glossary register:
-%\input{glossaries}
+\input{glossaries}
 
 %Bibliography DB
 \addbibresource{refs.bib}
@@ -55,16 +57,19 @@
 \begin{document}
 
 \maketitle
-%\include{chapters/introduction}
-%\include{chapters/conclusion}
-
+\include{chapters/introduction}
+\include{chapters/problem}
+\include{chapters/method}
+\include{chapters/background}
+\include{chapters/research}
+\include{chapters/results}
+\include{chapters/conclusion}
 \clearpage
 \printbibliography{}
 
 \appendix%
 \glsresetall%  Reset acronym tracking. (so reintroduce as "Full (ACR)" in appendices).
 
-%\include{appendices/literature}
+\include{appendices/literature}
 
 \end{document}
-% vim: spell spelllang=en_gb 
