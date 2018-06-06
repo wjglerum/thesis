@@ -1,1 +1,32 @@
 \chapter{Problem statement and motivation}
+\emph{You describe in detail what problem the research is addressing,
+and what is the motivation to address this problem. There is a concise and objective
+statement of the research questions, hypotheses and goals. It is made clear why these questions
+and goals are important and relevant to the world outside the university (assuming it exists).
+You can already split the main research question into subquestions in this chapter. This section
+also describes an analysis of the problem: where does it occur and how, how often, and what are
+the consequences? An important part is also to scope the research: what aspects are included
+and what aspects are deliberately left out, and why?}
+
+This chapter aims to explain the why of this thesis. First we explore and explain the problems with managing virtual container networks, next we elaborate on the motivation for this thesis. Last we introduce the research questions and explain why these are relevant.
+
+\section{Problem statement}
+At the moment applications are moved from legacy deployments to container deployments. A container is a set of isolated processes and application dependencies that are packaged together in an image. This image can run locally on a developers machine or on a container orchestration platform in production. Containers are more flexible opposed to \glspl{vm} as you do not need to run and boot an entire \gls{os}. The most well known system for running containers locally is Docker\footnote{\url{https://www.docker.com/}}. To make applications highly available people make use of a container orchestration platform like Kubernetes\footnote{\url{https://kubernetes.io/}} or \gls{dcos}\footnote{\url{https://dcos.io/}} to allow scaling of those containers. Cloud providers such as \gls{aws}\footnote{\url{https://aws.amazon.com//}} and \gls{gcp}\footnote{\url{https://cloud.google.com/}} even enable you to run containers without worrying about the underlying infrastructure. \todo[inline]{Do I cite or use a footnote for referencing to all those technologies??? Having all the footnotes seems messy, but a citation might be too much??}
+
+In production workloads operators want to isolate applications, the traditional way is to use firewall policies and different physical networks between applications in a datacenter. For containers operators need to be more flexible as workloads change all the time. Therefore they introduced a form of \gls{sdn} to create virtual networks within a container orchestration platform.  There are different implementations and vendors providing virtual networks and policies, such as Project Calico\footnote{\url{https://projectcalico.org/}} and Cilium\footnote{\url{https://cilium.io/}}. These plugins are standardised with the \gls{cni}\footnote{\url{https://github.com/containernetworking/cni}} standard, a set of specifications and plugins for configuring networks. \Gls{cni} allows you to chain different plugins together, for example for \gls{ipam}, overlay networks and network policies.
+
+The focus will be on \gls{dcos} and Calico as one of Lunatech's clients uses those technologies for their container orchestration. The client wants to isolate workloads from different tenants within their organisation and logically split workloads in the data processing pipeline. Currently there is no way for an operator of a cluster to see and manage the virtual networks and policies in \gls{dcos} as each \gls{cni} plugin uses its own control plane. An operator must reach down the host machine to inspect the network configuration. To allow easy administration and maintainability we need a solution to at least get an overview of the network and be able to inspect those. Thus there is no easy way for the client to check if workloads are really isolated. 
+\section{Motivation}
+When there is visibility of the implemented networks and policies we can empower administrators with better means to manage and maintain the virtual networks on a container orchestration platform. Allowing a developer to simply allow or deny traffic between different applications are namespaces. This can be achieved by erasing the differences between the \gls{cni} plugins and hiding their complexity from them. As an extensions we could also automatically provision new \gls{cni} plugins to help operators create new network services in a flexible manner, without worrying about the concrete implementation details.
+
+On a container orchestration platform we also need an ingress point to allow traffic to the container workloads. This involves for example configuring loadbalancers on your cloud platform. However when something changes on the container orchestration level, an operator must also update the relevant loadbalancers to redirect the traffic to the correct container. This is also called North-South traffic, East-West traffic is within the cluster when for example a pool of webservers talk to a pool of applications servers. The applications servers could be on a different virtual network, protected by network policies and need to be load-balanced.
+
+Furthermore when this is in place we can also look at automating the tasks of administrator as much as possible. Here we could think of self-adapting networks, where the system detects a sub-optimal solution and applies the new configuration in place, with or without the confirmation of the operator. Often it is the case that a firewall rule is blocking traffic, it can be very hard for an application developer who wants to deploy his application to find the exact problem, as his application works fine on his local machine. A visualisation can be created to help an operator to gain insight of the applied network policies, allowing to find the problematic policy faster in an interactive process. Self adapting networks and visualisations are outside the scope of this thesis, as we first need a way of exposing the current network infrastructure. When everything is in place it becomes easier to think of new use cases and ways to help operators and developers to debug the cluster and the applied policies.
+
+
+\section{Research questions}
+The following research questions were raised during the formulation of this assignment:
+\begin{itemize}
+    \item What are the current problems in maintaining virtual container networks and how do different vendors address this issue?
+    \item How can the maintainability of virtual container networks be improved through \gls{cni}?   
+\end{itemize}
