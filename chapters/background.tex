@@ -4,12 +4,52 @@
 In this chapter we give more background information about the technology stack relevant to this thesis. Not all technologies are in use at the client at the moment, but we include them to provide more information about similar technologies or new technologies that we could use. We start with containers and container orchestration platforms which form the basics of running workloads. Next we explore the different virtual networks technologies with \gls{cni}.
 
 \section{Containers}
+A Linux container is an isolated set of resources on a compute host. Containers work with namespacing: a container can only access resources in the same namespace and not any other namespaces. Meaning that a container can only see and modify its own processes and not other processes running in another container or on the host itself. Except for privileged containers which can use any resource and have access to every process on the host. 
+
+Furthermore every container will get its own isolated network stack preventing privileged access to sockets and interfaces on other containers. Of course you can enable links and bridges to allow IP connectivity to and from your container.
+
+Resource utilisation for containers is limited with \glspl{cgroup}. Giving each container a restricted set of resources, preventing the container to bring down the host by using too much RAM or CPU\cite{docker_security}.
+
 \subsection{Docker}
+Docker is the standard in industry for running Linux containers. The Docker Engine is a container platform that makes it easy to run your containers. You can easily run a container on your local developer machine and ship it to run in production. 
+
+It works with a Dockerfile to describe how to build your image. Every step will create a new layer and all these layers together is your Docker image. You can reuse these layers between containers so that you can make a generic application container and add a layer on top for the specific application. This allows for reusability and will save you storage and bandwidth when sharing your images. The most populer way to share images is the Docker hub, however you can also host a private Docker registry to host your own images.
+
 \subsection{Kubernetes}
+Kubernetes is an open-source container orchestration platform, based on the internal container engine used at Google. The basic scheduling unit in Kubernetes is a pod. A pod is collection of one or more containers that are co-located together on a host and share an unique IP address preventing port conflicts in the cluster. Pods allow you to run tightly coupled applications together.
+
+Kubernetes is made of different loosely coupled components as can be seen in Figure~\ref{fig:k8s-arch}. The masters run a key-value store called etcd\cite{etcd}, the API server and a scheduler component. An operator gives the cluster the desired state by running commands to the API server and stores its state in etcd. Next the scheduler makes sure that the desired state is achieved by choosing and instructing the nodes to run or delete the pods.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\columnwidth]{images/k8s-arch}
+    \caption{Kubernetes architecture diagram\cite{k8s_arch}}
+    \label{fig:k8s-arch}
+\end{figure}
+
+The Kubernetes nodes, also called workers or minions, run the actual workloads which are Linux containers using the Docker Engine. The state is managed by the kubelet component which will accept resource offerings from the scheduler. The kube-proxy is responsible for managing the network. It routes incoming traffic to the pod addresses and it can expose pods bundled as a service to the cluster serving as a load balancer to the pods or services. 
+
 \subsection{DC/OS}
+\Gls{dcos} describes itself in the documentation\cite{dcos_what}: 
+\begin{displayquote}
+``As a datacenter operating system, DC/OS is itself a distributed system, a cluster manager, a container platform, and an operating system.''
+\end{displayquote} 
+Unlike a traditional operating system \gls{dcos} runs as a distributed operating system on different nodes and each node has its own host operating system. The master nodes accept tasks and schedules them on the agent nodes. Apache Mesos\cite{apache_mesos}, a distributed systems kernel, is mostly responsible for the lifecycle of tasks. It launches schedulers on the slave based on the type of tasks. \Gls{dcos} has two build-in schedulers for scheduling Linux containers and two different container runtimes which can be seen in Figure~\ref{fig:dcos-arch}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\columnwidth]{images/dcos-arch}
+    \caption{Kubernetes architecture diagram\cite{dcos_arch}}
+    \label{fig:dcos-arch}
+\end{figure}
+
+Marathon\cite{marathon} runs the actual container orchestration engine, allowing you to schedule tasks and frameworks. A task could be an application inside a Docker image and a framework could be Kafka\cite{kafka} or Cassandra\cite{cassandra} which manage their own lifecyle using Marathon. To periodically schedule jobs operators can use Metronome\cite{metronome}. It allows to run jobs once or based on a regular schedule. On \gls{dcos} operators are not only limited to running containers, as binary executables can be launched and containerised at runtime. Furthermore the Docker Engine is present on every slave to run the Docker images, however operators can also use the Mesos \gls{ucr}\cite{ucr} to run Docker images and binary executables.
+
+The technologies and components mentioned above make it possible to run different kind of workloads, not just containerised workloads. Furthermore we can even run Kubernetes as a framework on \gls{dcos}, this way the Kubernets scheduler will ask Mesos for resource offerings.
 
 \section{CNI}
-\todo[inline]{CNI and/vs libnetwork}
+To deal with networking and containers the \gls{cni} specification was created, describing how to interact with network interfaces in Linux containers. This allows providers to write plugins to configure \gls{sdn} with container workloads. Mesos, \gls{dcos}, Kubernetes and even \gls{aws} have support for \gls{cni}. Allowing operators to create virtual networks on container orchestration platforms.
+\Gls{cni} only deals with creating and deleting network resources, it does not do network policies for example. Network policies need to be managed by the plugin itself, as every plugin has a different goal and ways of enforcing policies.
 
 \subsection{Standard plugins}
 There is a set of standard provided plugins\cite{cni_plugin} that allow for basic operations like creating network interfaces and IP address allocation. Different kinds of interfaces can be created such as bridges, loopback interfaces and \glspl{vlan}. IP addresses can be either requested from a \gls{dhcp} server or maintained by a local database of allocated IPs. Other plugin providers can provide their own implementations of assigning IP address to containers.
