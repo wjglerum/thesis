@@ -56,7 +56,7 @@ The technologies and components mentioned above make it possible to run differen
 \label{sec:cni}
 To deal with networking and containers the \gls{cni} specification was created, describing how to interact with network interfaces in Linux containers. This allows providers to write plugins to configure \gls{sdn} with container workloads. Mesos, \gls{dcos}, Kubernetes and even \gls{aws} have support for \gls{cni}. Allowing operators to create virtual networks on container orchestration platforms.
 \Gls{cni} only deals with creating and deleting network resources, it does not do network policies for example. Network policies need to be managed by the plugin itself, as every plugin has a different goal and ways of enforcing policies.
-\todo[inline]{Maybe add CNM for Docker here too https://github.com/docker/libnetwork/blob/master/docs/design.md}
+\todo[inline]{Maybe add CNM for Docker here too \url{https://github.com/docker/libnetwork/blob/master/docs/design.md}}
 
 \subsection{Standard plugins}
 \label{subsec:plugins}
