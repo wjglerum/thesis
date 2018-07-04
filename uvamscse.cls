@@ -114,7 +114,7 @@
     {\Large\bfseries\uvaauthor\par}
     \uvaemail
     \vspace{11pt}
-    \uvadate, \pageref*{lastpage} pages
+    \uvadate
   \end{center}
   \vfill
   \begin{tabular}{ll}

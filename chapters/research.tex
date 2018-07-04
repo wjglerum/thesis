@@ -1,4 +1,4 @@
-\chapter{Research}
+\chapter{Problems with Virtual Container Networks}
 \label{chap:research}
 %\emph{This chapter reports on the execution of the research method as described in an earlier chapter. If the research has been divided into phases, they are introduced, reported on and concluded individually. If needed, this chapter could be split up to balance out the sizes of all chapters.}
 This chapter reports on the execution of the research to demonstrate what has been done. First we explain the current difficulties with managing virtual networks on \gls{dcos}. Next we explain the approach how another popular container orchestration platform, Kubernetes, handles virtual networks. Last we explain the different approaches we explored to improve the maintainability and management of virtual networks on \gls{dcos} for the \gls{poc}.
@@ -59,19 +59,7 @@ To summarise we have the following drawbacks of using \gls{cni} plugins on \gls{
     \item Different \gls{dns} providers return different IP addresses for container workloads on a virtual network.
 \end{itemize}
 
-\subsection{Problems}
-\label{subsec:problems}
-
 \section{Virtual networks in Kubernetes}
 \label{sec:k8s-virtual-networks}
-
-\section{Proof of concept}
-\label{sec:proof-of-concept}
-
-\subsection{Expanding CNI}
-\label{subsec:expanding-cni}
-
-\subsection{Networkobject API}
-\label{subsec:networkobject-api}
-
-
+There are different ways of connecting containers in Kubernetes. The most basic one is in a pod where containers in the same pod can communicate via localhost. Pods get their own unique IP address, preventing operators to deal with port mappings and linking services together. 
+\todo[inline]{expand on K8S}
