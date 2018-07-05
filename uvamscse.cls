@@ -137,3 +137,4 @@
   \immediate\write\@auxout{\string
   \newlabel{lastpage}{{}{\thepage}{}{}}}%
   \addtocounter{page}{1}}
+  

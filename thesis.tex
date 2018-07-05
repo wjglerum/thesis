@@ -11,6 +11,8 @@
 \usepackage{xcolor}
 \usepackage{framed}
 \usepackage{listings}
+\usepackage{protobuf/lang}  % include language definition for protobuf
+\usepackage{protobuf/style} % include custom style for proto declarations.
 \usepackage[backend=biber,style=numeric]{biblatex}
 \usepackage[colorinlistoftodos]{todonotes}
 \usepackage{pgfgantt}
@@ -24,15 +26,14 @@
 \author{Willem Jan Glerum - 11317493}
 \authemail{wjglerum@gmail.com}
 \host{Lunatech Labs B.V. \url{https://lunatech.com} }
-\supervisor{Dr. Paola Grosso}
+\supervisor{dr. P. Grosso\\&dr. R.S. Cushing}
 \date{\today}
 %Random virtual network image
 \coverpic[200pt]{images/virtual.png}
 
 \abstract{
 \todo[inline]{Fill}
-  This section summarises the content of the thesis for potential readers who do not have time to read it whole,
-  or for those undecided whether to read it at all. Sum up the following aspects:
+  This section summarises the content of the thesis for potential readers who do not have time to read it whole,  or for those undecided whether to read it at all. Sum up the following aspects:
 
   \begin{itemize}
     \item relevance and motivation for the research
@@ -60,19 +61,18 @@
 \maketitle
 \include{chapters/introduction}
 \include{chapters/problem}
-%\include{chapters/method}
 \include{chapters/background}
 \include{chapters/research}
-\include{chapters/results}
+\include{chapters/poc}
 \include{chapters/discussion}
 \include{chapters/conclusion}
 
 \clearpage
 \printbibliography{}
 
-\appendix%
-\glsresetall%  Reset acronym tracking. (so reintroduce as "Full (ACR)" in appendices).
+\appendix
+\glsresetall
 
-%\include{appendices/literature}
+\include{appendices/model}
 
 \end{document}
