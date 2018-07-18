@@ -18,6 +18,7 @@
 \usepackage{pgfgantt}
 \usepackage{hyperref}
 \usepackage[toc,acronym,nogroupskip,nohypertypes={acronym}]{glossaries}
+\usepackage{subcaption}
 
 \colorlet{shadecolor}{yellow}
 
@@ -26,7 +27,8 @@
 \author{Willem Jan Glerum - 11317493}
 \authemail{wjglerum@gmail.com}
 \host{Lunatech Labs B.V. \url{https://lunatech.com} }
-\supervisor{dr. P. Grosso\\&dr. R.S. Cushing}
+\supervisor{dr. P. Grosso \url{p.grosso@uva.nl}}
+\hostsupervisor{dr. A. Haxaire \url{adrien.haxaire@lunatech.nl}}
 \date{\today}
 %Random virtual network image
 \coverpic[200pt]{images/virtual.png}
@@ -47,6 +49,7 @@
 
 %Glossary register:
 \input{glossaries}
+\makeglossaries
 
 %Bibliography DB
 \addbibresource{refs.bib}
@@ -59,20 +62,26 @@
 \begin{document}
 
 \maketitle
+\listoftodos
 \include{chapters/introduction}
 \include{chapters/problem}
 \include{chapters/background}
 \include{chapters/research}
 \include{chapters/poc}
+\include{chapters/validation}
 \include{chapters/discussion}
 \include{chapters/conclusion}
 
 \clearpage
+\listoffigures
+\listoftables
+\printglossaries
+
 \printbibliography{}
 
 \appendix
 \glsresetall
 
-\include{appendices/model}
+%\include{appendices/model}
 
 \end{document}

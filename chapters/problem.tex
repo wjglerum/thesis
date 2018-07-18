@@ -4,7 +4,7 @@
 
 \section{Problem statement}
 \label{sec:problem-statement}
-\todo[inline]{explain what you mean with maintainability and administration -> or the same}
+\todo[inline]{explain what you mean with maintainability and administration; or the same?}
 At the moment applications are moved from traditional deployments to container deployments. Instead of manually logging into a server, downloading, installing and configuring the application we can now download and run a container image with. A container is a set of isolated processes and application dependencies that are packaged together in an image. This image can run locally on a developer's machine or on a container orchestration platform in production. Containers are considered more flexible than \glspl{vm} as you do not need to run and boot an entire \gls{os}. The most well known system for running containers locally is Docker\cite{docker}. To make applications highly available in production people make use of a container orchestration platform like Kubernetes\cite{kubernetes} or \gls{dcos}\cite{dcos} to allow scaling of those containers. Cloud providers such as \gls{aws}\cite{aws} and \gls{gcp}\cite{gcp} even enable you to run containers without worrying about the underlying infrastructure.
 
 In production workloads operators want to isolate applications. The traditional way is to use firewall policies and different physical networks between applications in a datacenter. Container operators need to be more flexible as workloads change all the time. That is what let to the introduced a form of \gls{sdn} to create virtual networks within a container orchestration platform.  There are different implementations and vendors providing virtual networks and policies, such as Project Calico\cite{calico} and Cilium\cite{cilium}. These plugins are standardised with the \gls{cni}\cite{cni} standard, a set of specifications and plugins for configuring virtual networks. \Gls{cni} allows you to chain different plugins together, for example for \gls{ipam}, overlay networks and network policies by Calico.
@@ -24,7 +24,7 @@ Furthermore when this is in place we can also look at automating the tasks of an
 The following research questions were raised with the help of the motivation above during the formulation of this thesis:
 \begin{itemize}
     \item \textbf{RQ1} What are the current problems in maintaining virtual container networks and how do different vendors address this issue?
-    \item \textbf{RQ2} How can the maintainability of virtual container networks be improved through \gls{cni}?   
+    \item \textbf{RQ2} How can the management of virtual container networks be improved through \gls{cni}?   
 \end{itemize}
 
 \subsection{RQ1}

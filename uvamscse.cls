@@ -35,6 +35,9 @@
 \newcommand{\uvahost}{Universiteit van Amsterdam}
 \newcommand{\host}[1]{\renewcommand{\uvahost}{#1}}
 
+\newcommand{\uvahostsuper}{Universiteit van Amsterdam}
+\newcommand{\hostsupervisor}[1]{\renewcommand{\uvahostsuper}{#1}}
+
 \newcommand{\uvatitle}{Cool Story Bro. Name It with \texttt{$\backslash$title} and \texttt{$\backslash$subtitle}}
 \renewcommand{\title}[1]{\renewcommand{\uvatitle}{#1}\hypersetup{pdftitle={#1}}}
 \newcommand{\uvasubtitle}{}
@@ -119,6 +122,7 @@
   \vfill
   \begin{tabular}{ll}
   	\textbf{Supervisor:} 		& \uvasuper\\
+  	\textbf{Host supervisor:}   & \uvahostsuper\\
   	\textbf{Host organisation:} & \uvahost
   \end{tabular}
   \uvacoverfoot

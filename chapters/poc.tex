@@ -1,13 +1,14 @@
 \chapter{Proof of Concept}
 \label{chap:proof-of-concept}
 %\emph{This chapter presents and clarifies the results obtained during the research. The focus should be on the factual results, not the interpretation or discussion. Tables and graphics should be used to increase the clarity of the results where applicable.}
-In Chapter~\ref{chap:research} we explained the difficulties of managing virtual network on \gls{dcos}. The main problem is that operators of clusters cannot get an overview of the virtual networks and the applied network policies. In this chapter we propose two solutions. First we explain how we could do this by expanding the \gls{cni} specification, next we report on the solution we implemented.
+In Chapter~\ref{chap:research} we explained the difficulties of managing virtual network on \gls{dcos}. The main problem is that operators of clusters cannot get an overview of the virtual networks and the applied network policies. In this chapter we propose two solutions. First we explain how we could do this by expanding the \gls{cni} specification, next we report on the solution we implemented in the \gls{poc}. \todo[inline]{Rephrase as this is not properly linked to previous chapter}
 
 \section{Extending CNI}
 \label{sec:expanding-cni}
-One of the first ideas we had was to extend \gls{cni} to be bi-directional which would allow operators to retrieve information about the virtual networks. To see which virtual networks are present and which containers are connected to the virtual network. The specification already has an \texttt{ADD} action that returns the network state of a container when it has been created. However this does not allow you to query the current state of the networks. It would require to create a custom solution to keep track of the current network state and follow the changes to the containers. To make this work we would have to adapt the \gls{cni} specification to include a new action to allow querying of the network state of containers. This new action could logically be called \texttt{GET}, returning the same information when the \texttt{ADD} action was invoked and allows for caching of the results.
+\todo[inline]{vague/confusing/rewrite}
+One of the first ideas we had was to extend \gls{cni} to be bi-directional which would allow operators to retrieve information about the virtual networks, to see which virtual networks are present and which containers are connected to the virtual network. The specification already has an \texttt{ADD} action that returns the network state of a container when it has been created. However this does not allow to query the current state of the networks. It would require to create a custom solution to keep track of the current network state and follow the changes to the containers. To make this work we would have to adapt the \gls{cni} specification to include a new action to allow querying of the network state of containers. This new action could logically be called \texttt{GET}, returning the same information when the \texttt{ADD} action was invoked and allows for caching of the results.
 
-We decided not to touch the \gls{cni} specification for this thesis, as creating a new action in the \gls{cni} specication would require coordination and working together with different people and companies developing \gls{cni} plugins. At the beginning of this thesis the community was already discussing the need for a new action that would retrieve the current state of the network of a container. Maintainers did not agree yet on whether this should be implemented. Not only would we have to adjust the specification, we would also have to extend the \gls{cni} plugins in use at the client to support a new action. Furthermore this action will only expose information about the network state of the container, not the state of the virtual networks in the cluster which operators want to see. Network policies are not included in the \gls{cni} specification. With the new \texttt{GET} action in place we would still need a different solution for managing network policies. 
+We decided not to touch the \gls{cni} specification for this thesis, as creating a new action in the \gls{cni} specification would require coordination and working together with different people and companies developing \gls{cni} plugins. At the beginning of this thesis the community was already discussing the need for a new action that would retrieve the current state of the network of a container. Maintainers did not agree yet on whether this should be implemented. Not only would we have to adjust the specification, we would also have to extend the \gls{cni} plugins in use at the client to support a new action. Furthermore this action will only expose information about the network state of the container, not the state of the virtual networks in the cluster which operators want to see. Network policies are not included in the \gls{cni} specification. With the new \texttt{GET} action in place we would still need a different solution for managing network policies. 
 
 \section{Network Object API}
 \label{sec:networkobject-api}
@@ -15,39 +16,44 @@ Instead of extending the \gls{cni} specification we decided to build a \gls{poc}
 
 \subsection{Network Object Model}
 \label{subsec:network-object-model}
-The network object model contains different properties for defining networks in \gls{dcos}. The specification for this model can be found in Appendix~\ref{app:model}. We explain the basic idea for each component below.
+The network object model contains different properties for defining networks in \gls{dcos}. The specification for this model can be found in Listing~\ref{lst:nom}. We explain the basic idea for each component.
+
+\lstinputlisting[label={lst:nom},caption={Network Object Model in Protocol buffers format},language=protobuf2,style=protobuf]{code/networkobject.proto}
+
 \begin{itemize}
     \item[\textbf{Virtual Network}] Specifies the basic properties of a network. Containing the name and subnet of a virtual network.
-    \item[\textbf{Network Driver}] Driver for the specified network, which can be a standard plugin, a \gls{dcos} overlay network or a \gls{cni} plugin.
-    \item[\textbf{Network Policy}] A set of firewall rules for a given network. These rules can be either level 4 rules for packet filtering based on port and host or level 7 rules to inspect on application level. Rules can also be applied based on labels to firewall specific applications or traffic.
-    \item[\textbf{Network Service}] Services could be a set of different things to attach to a network. For example a cloud provider integration for ingress traffic or specifying \gls{qos} with an application.
+    \item[\textbf{Network Driver}] Driver for the specified network, which can be  a \gls{dcos} overlay network, a standard plugin, or a \gls{cni} plugin.
+    \item[\textbf{Security Policy}] A set of firewall rules for a given network. These rules can be either level 4 rules for packet filtering based on port and host or level 7 rules to inspect on application level. Rules can also be applied based on labels to firewall specific applications or traffic.
+    \item[\textbf{Network Service}] Services could be a set of different things to attach to a network. For example a cloud provider integration for ingress traffic to the cluster.
 \end{itemize}
 
 \subsection{Overall System Design}
 \label{subsec:system-design}
-For a new system we first need to come up with a design. The idea is that this new service on the masters of a \gls{dcos} cluster. We chose the masters as they are already highly-available in a default setup. Both CockroachDB\cite{cockroachdb} and Zookeeper\cite{zookeeper} are already running on the master for other \gls{dcos} components. It is also possible to use etcd\cite{etcd} as a central key-value store on the master. However this decision is out of scope for this thesis as the \gls{poc} in Section~\ref{subsec:poc-architecture} uses a different approach.
+The idea is that this new service runs on the masters of a \gls{dcos} cluster. We choose the masters as they are already highly-available in a default setup. Both CockroachDB\cite{cockroachdb} and Zookeeper\cite{zookeeper} are already running on the master providing distributed storage for other \gls{dcos} components. It is also possible to use etcd\cite{etcd} as a central key-value store on the master. However this decision is out of scope for this thesis as the \gls{poc} in Section~\ref{subsec:poc-architecture} uses a different approach.
 
-This system is based on the idea of the kube-apiserver from Kubernetes as discussed in Section~\ref{sec:k8s-virtual-networks} where an operator can query the current state and submit the required state. The system would not only provide insight to the available virtual networks and policies, but also be open to integrate with cloud providers for North-South traffic into the cluster.
-
-\todo[inline]{clearly list features, maybe diagram}
+The system is based on the idea of the kube-apiserver from Kubernetes as discussed in Section~\ref{subsec:kubernetes} where an operator can query the current state and submit the required state. The system would not only provide insight to the available virtual networks and policies, but also be open for example to integrate with cloud providers for North-South traffic into the cluster. The new system should have the following features: \todo[inline]{create diagram of system design}
 \begin{itemize}
-    \item highly-available on the masters
-    \item distributed key-value store
-    \item overview of networks
-    \item overview of network policies, per network, app, pod or service.
-    \item provision networks and 
-    \item integrate with cloud providers for ingress LB traffic
+    \item Run highly-available on the masters
+    \item Use a distributed higly-available storage solution
+    \item Show an overview of the available virtual networks
+    \item Allow to create, configure and delete virtual networks
+    \item Give an overview of the applied network policies per network, tasks or framework.
+    \item Allow to create, configure and delete network policies
+    \item Integrate with cloud providers to configure ingress traffic
 \end{itemize}
 
 \subsection{PoC Architecture}
 \label{subsec:poc-architecture}
-Due to the time constraint of this thesis we decided that we want to show a basic \gls{poc} where an operator can see the configured policies for a given container on a virtual network. We also reused parts from the opensource project Kubernetes to save time. Mesosphere recently added support for running Kubernetes on a \gls{dcos} cluster. We reuse the kube-apiserver with \glspl{crd} to submit and query network objects. The kube-apiserver can run standalone however it depends on other Kubernetes components. Instead of trying to strip the kube-apiserver from Kubernetes components, we run an entire Kubernetes cluster on our \gls{dcos} cluster. This does cause some overhead, but we were still able to run a full cluster on a single Macbook Pro with 16GB of RAM. It took some time to tune the CPU and memory usage. For a production ready solution we should implement both the apiserver and storage to run on the masters.
+We want to show a basic \gls{poc} \todo[inline]{Explain basic, not all functions} where an operator can see the configured policies for a given container on a virtual network. Showing the available networks can be easily achieved with this new API in place, however creating virtual networks is more difficult. To create a virtual network on demand we would have to distribute the plugin and its configuration to every node, requiring a custom build solution. Mesoshpere is working on providing such a system to distribute files to nodes for volume mount, which we could later use to distribute network specific files to every node.
 
-Next we created a customer controller in Go based on one of the examples provided by Kubernetes for \glspl{crd}. This is a controller written in Go that listens to the updates for a specific \gls{crd} from the apiserver. With a Dockerfile we can build a container and run it on the \gls{dcos} cluster and connect to the kube-apiserver, allowing us to rapidly prototype and try out new queries for our network objects. The only difficulty is getting the configuration and credentials for access to the Kubernetes cluster in our custom controller. Luckily Marathon has support for volume mounts, so we can generate the configuration file once on the host allowing the container to read it from the volume mount to connect to the Kubernetes cluster.
+We also reused parts from the opensource project Kubernetes to save time. Mesosphere recently added support for running Kubernetes on a \gls{dcos} cluster. We reuse the kube-apiserver with \glspl{crd} to submit and query network objects to be stored in etcd. This saves us from the burden of writing our own REST API server and setting it up manually on the masters. The kube-apiserver runs as a single container however it depends on other Kubernetes components such as etcd to store information. Instead of trying to strip the kube-apiserver from Kubernetes components, we run an entire Kubernetes cluster on our \gls{dcos} cluster. This does cause some overhead, but we are still able to run a full cluster on a single Macbook Pro with 16GB of RAM. It did took some time to tune the CPU and memory usage to allow it to run on a single developer machine. For a production ready solution we should implement both the \gls{api} server and storage to run on the masters as discussed in Section~\ref{subsec:system-design}.
 
+Next we created a custom controller written in GoLang\cite{golang} based on one of the examples provided by Kubernetes for dealing with \glspl{crd}. This controller listens to the updates on the kube-apiserver of a specific \gls{crd}. With a custom Dockerfile we can build a container and run it on the \gls{dcos} cluster. Connect it to the kube-apiserver, allowing us to rapidly prototype and try out new queries for our network objects. The only difficulty is getting the configuration and credentials for access to the Kubernetes cluster in our custom controller. Luckily Marathon has support for volume mounts, so we can generate the configuration file once on the host allowing the container to read it from the volume mount to connect to the Kubernetes cluster.
+
+In short we use the following components for this \gls{poc}:
 \begin{itemize}
-    \item utilize k8s on dcos
-    \item use k8s-api for storing network object
-    \item custum listener in go
+    \item Kubernetes as a framework on \gls{dcos}
+    \item Utilise the kube-apiserver with etcd to store our network object \gls{crd}
+    \item Custom controller listening for events and integrates with the Calico \gls{api}
 \end{itemize}
-\todo[inline]{Architecture image}
+\todo[inline]{create poc architecture image}
