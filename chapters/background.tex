@@ -2,7 +2,7 @@
 \label{chap:background}
 %\emph{This chapter contains all the information needed to put the thesis into context. It is common to use a revised version of your literature survey for this purpose. It is important to explicitly refer from your text to sources you have used, they will be listed in your bibliography.}
 
-In this chapter we give more background information about the technology stack relevant to this thesis. Not all technologies are in use at the client \todo[inline]{which client?} at the moment, but we include them to provide more information about similar technologies or new technologies that we could use in the future. We start with containers and container orchestration platforms which form the basics of running containerised workloads. Next we explore the different virtual networks technologies with \gls{cni}.
+In this chapter we give more background information about the technology stack relevant to this thesis. Not all technologies are in use at the Lunatech's automotive at the moment, but we include them to provide more information about similar technologies or new technologies that we could use in the future. We start with containers and container orchestration platforms which form the basics of running containerised workloads. Next we explore the different virtual networks technologies with \gls{cni}.
 
 \section{Containers}
 \label{sec:containers}
@@ -39,7 +39,7 @@ The Kubernetes nodes, also called workers or minions, run the actual workloads w
 \begin{displayquote}
 ``As a datacenter operating system, DC/OS is itself a distributed system, a cluster manager, a container platform, and an operating system.''
 \end{displayquote} 
-Unlike a traditional operating system \gls{dcos} runs as a distributed operating system on different nodes and each node has its own host operating system. The master nodes accept tasks and schedule them on the agent nodes. Apache Mesos\cite{apache_mesos}, a distributed systems kernel, is responsible for the lifecycle of tasks. It launches schedulers on the slaves based on the type of tasks. \Gls{dcos} has two built-in schedulers for scheduling Linux containers and two different container runtimes which can be seen in Figure~\ref{fig:dcos-arch}. \todo[inline]{Explain what I see in the figure}
+Unlike a traditional operating system \gls{dcos} runs as a distributed operating system on different nodes and each node has its own host operating system. The master nodes accept tasks and schedule them on the agent nodes. Apache Mesos\cite{apache_mesos}, a distributed systems kernel, is responsible for the lifecycle of tasks. It launches schedulers on the slaves based on the type of tasks. Figure~\ref{fig:dcos-arch} shows an overview of all the components in a \gls{dcos} cluster. \Gls{dcos} has two built-in schedulers for scheduling Linux containers and two different container runtimes which can be seen in the container orchestration box on the master nodes in Figure~\ref{fig:dcos-arch}. 
 
 \begin{figure}
     \centering
@@ -48,15 +48,14 @@ Unlike a traditional operating system \gls{dcos} runs as a distributed operating
     \label{fig:dcos-arch}
 \end{figure}
 
-Marathon\cite{marathon} runs the actual container orchestration engine, allowing to schedule tasks and frameworks. A task could be an application inside a Docker image and a framework could be Kafka\cite{kafka} or Cassandra\cite{cassandra} which manage their own lifecyle using Marathon. To periodically schedule jobs, operators can use Metronome\cite{metronome}, which allows to run jobs once or based on a regular schedule. On \gls{dcos} operators are not only limited to running containers, as binary executables can be launched and containerised at runtime. The Docker Engine is present on every slave to run the Docker images, operators can also choose to use the Mesos \gls{ucr}\cite{ucr} to run Docker images and binary executables.
+Marathon\cite{marathon} runs the actual container orchestration engine, allowing to schedule tasks and frameworks. A task could be an application inside a Docker image and a framework could be Kafka\cite{kafka} or Cassandra\cite{cassandra} which manage their own life cycle using Marathon. These frameworks and other services can be installed as a package from the Mesosphere Universe\cite{universe}. To periodically schedule jobs, operators can use Metronome\cite{metronome}, which allows to run jobs once or based on a regular schedule. On \gls{dcos} operators are not only limited to running containers, as binary executable can be launched and containerised at runtime. The Docker Engine is present on every slave to run the Docker images or operators can choose to use the Mesos \gls{ucr}\cite{ucr} to run Docker images and binary executables.
 
 The technologies and components mentioned above make it possible to run different kind of workloads, not just containerised workloads. We can even run Kubernetes as a framework on \gls{dcos}, this way the Kubernetes scheduler will ask Mesos for resource offerings.
 
 \section{CNI}
 \label{sec:cni}
-To deal with networking and containers the \gls{cni} specification was created, describing how to interact with network interfaces in Linux containers. This allows providers to write plugins to configure \gls{sdn} with container workloads. Mesos, \gls{dcos}, Kubernetes and even \gls{aws} have support for \gls{cni}. Allowing operators to create virtual networks on container orchestration platforms.
-\Gls{cni} only deals with creating and deleting network resources, it does not do network policies for example. Network policies need to be managed by the plugin itself, as every plugin has a different goal and ways of enforcing policies.
-\todo[inline]{Maybe add CNM for Docker here too \url{https://github.com/docker/libnetwork/blob/master/docs/design.md}}
+To deal with networking and containers the \gls{cni} specification was created, describing how to interact with network interfaces in Linux containers. This allows providers to write plugins to configure \gls{sdn} with container workloads. Mesos, \gls{dcos}, Kubernetes and even \gls{aws} have support for \gls{cni} plugins. Allowing operators to create virtual networks on container orchestration platforms.
+The \gls{cni} specification only deals with creating and deleting network resources, it does not do network policies for example. Network policies need to be managed by the plugin itself, as every plugin has a different goal and ways of enforcing policies. A similar project exists for the Docker daemon called \gls{cnm}\cite{cnm, dua2016learning} implemented as libnetwork where developers can also develop new plugins. For example Project Calico provides plugins for both \gls{cni} and \gls{cnm} and both are installed when using the universe package from \gls{dcos}.
 
 \subsection{Standard plugins}
 \label{subsec:plugins}

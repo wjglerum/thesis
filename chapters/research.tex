@@ -1,7 +1,20 @@
 \chapter{Problems with Virtual Container Networks}
 \label{chap:research}
 %\emph{This chapter reports on the execution of the research method as described in an earlier chapter. If the research has been divided into phases, they are introduced, reported on and concluded individually. If needed, this chapter could be split up to balance out the sizes of all chapters.}
- First we explain the current difficulties with managing virtual networks on \gls{dcos} in Section~\ref{sec:current-state}. Next we explain the approach taken by another popular container orchestration platform, Kubernetes, to handle virtual networks in Section~\ref{sec:k8s-virtual-networks}. To finish we provide an overview of the problems at the end of this chapter in Section~\ref{sec:problems}.
+ First we explain which features are required by operators to manage virtual networks in Section~\ref{sec:required-features}, secondly we explain the current difficulties with managing virtual networks on \gls{dcos} in Section~\ref{sec:current-state}. Next we explain the approach taken by another popular container orchestration platform, Kubernetes, to handle virtual networks in Section~\ref{sec:k8s-virtual-networks}. To finish we provide an overview of the problems at the end of this chapter in Section~\ref{sec:problems}.
+
+\section{Required features}
+\label{sec:required-features}
+We came up with a list of required features that an operator should be able to execute to manage virtual networks and policies on a container orchestration platform. Below is list of the features with an accompanying explanation from the viewpoint of an operator of the cluster. As an operator I want to:
+\begin{itemize}
+    \item[\textit{list virtual networks:}] to see which networks are available in my cluster and see properties such as the name, tags, subnets and available IP addresses.
+    \item[\textit{select virtual network:}] to select a virtual network to launch my workload on.
+    \item[\textit{create virtual network:}] to provision and create new virtual networks in my cluster without manually configuring every agent in the cluster.
+    \item[\textit{list network policies:}] to get an overview of all the configured network policies in the cluster, which can be filtered based on service, tenant or label to search for specific rules that are blocking traffic.
+    \item[\textit{create network policy:}] to apply new firewall policies in the cluster without worrying about the different implementations of different plugin vendors.
+    \item[\textit{know the available IPv4 addresses:}] to determine if the solution is usable for the number of services in the cluster.
+    \item[\textit{have IPv6 support:}] to allow for native IPV6 support for my services and a bigger pool of available IP address for the growing number of applications with their own IP address.
+\end{itemize}
 
 \section{Current state of virtual networks in DC/OS}
 \label{sec:current-state}
@@ -74,9 +87,9 @@ To summarise we have the following drawbacks of using \gls{cni} plugins on \gls{
 
 \section{Virtual networks in Kubernetes}
 \label{sec:k8s-virtual-networks}
-There are different ways of connecting containers in Kubernetes. The most basic one is in a pod where containers in the same pod can communicate via localhost. Pods get their own unique IP address, preventing operators to deal with port mappings and linking services together. 
-\todo[inline]{expand on K8S networks}
-\todo[inline]{explain CRD on K8S}
+There are different ways of connecting containers in Kubernetes. The most basic one is in a pod where containers in the same pod can communicate via localhost. Pods get their own unique IP address, called the IP-per-pod model, preventing operators to deal with port mappings and \gls{nat} to connect to pods from another pod or host. This network can be implemented by a \gls{cni} plugin or other available\gls{sdn} solutions\cite{k8s-network} which are available in Kubernetes. Furthermore if a plugin supports network policies an operator can leverage the plugin to configure network policies in the cluster. All the virtual network related options can be configured using the kube-apiserver as discussed in Section~\ref{subsec:kubernetes}, such as configuring the network provider and managing its network policies regardless of the chosen implementation. This makes it easy and transparent to the operators of a Kubernetes cluster.
+
+To connect to a pod, from another pod or externally through a load balancer, we cannot use the pod IP address as this IP can change when pods are being rescheduled by the scheduler or when we have a set of the same pods for high availability. We can define a service which uses the kube-proxy, which is present on every node, to route the requests to the right set of pods. By default traffic from the client is captured by iptables\cite{iptables} on the host and redirected to be forwarded by the kube-proxy.
 
 \section{Problems with virtual networks on DC/OS}
 \label{sec:problems}
@@ -84,19 +97,17 @@ In the first section of this chapter we showed that operators can chose to launc
 
 \begin{table}[ht]
 \centering
-\begin{tabular}{l l l l} 
- \textbf{Feature} & \textbf{\gls{dcos} overlay networks} & \textbf{\gls{dcos} \gls{cni} plugins} & \textbf{Kubernetes} \\
- \hline\hline
- List virtual networks & Available & Manual on every host & Available \\
- Select virtual network & Available & Available & Available \\
- Create virtual network & Only at installation time & Manual on every host & Available \\
- List network policies & Manual on every host & Plugin specific  & Available \\
- Create network policy & Manual on every host & Plugin specific & Available \\
- Available IP addresses & 32 per containerizer per host & Plugin specific & Plugin specific \\
- IPv6 support & Only for Docker containers & Plugin specific & Plugin specific \\
- \hline
+\renewcommand*{\arraystretch}{1.4}
+\begin{tabular}{|p{4cm}|p{2.5cm}|p{4cm}|p{2.5cm}|}\hline 
+ \textbf{Feature} & \textbf{\gls{dcos} overlay networks} & \textbf{\gls{dcos} \gls{cni} plugins} & \textbf{Kubernetes}\\ \hline
+ \textit{List virtual networks} & Available & Operator has to manual inspect the \gls{cni} configuration files on every host & Available \\ \hline
+ \textit{Select virtual network} & Available & Operator has to manual provide a virtual network name based on the list obtained from above & Available \\ \hline
+ \textit{Create virtual network} & Only at installation time & Manual on every host & Available \\ \hline
+ \textit{List network policies} & Network policies are not provided & Operator has to use the plugin specific \gls{api}  & Available \\ \hline
+ \textit{Create network policy} & Network policies are not provided & Operator has to use the plugin specific \gls{api} & Available \\ \hline
+ \textit{Available IPv4 addresses} & 32 per containerizer per host & Plugin specific & Plugin specific \\ \hline
+ \textit{IPv6 support} & Only for Docker containers & Plugin specific & Plugin specific \\ \hline
 \end{tabular}
 \caption{Available features for virtual container networks}
 \label{tab:problems}
 \end{table}
-\todo[inline]{Explain features at the beginning of this chapter}
