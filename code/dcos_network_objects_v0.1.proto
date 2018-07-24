@@ -1,0 +1,54 @@
+message NetworkObject {
+  repeated VirtualNetwork network = 1;
+  repeated NetworkDriver driver = 2;
+  repeated NetworkService service = 3;
+}
+
+message VirtualNetwork {
+  required string name = 1;
+  repeated string namespace = 2;
+  required string driver = 3;
+  repeated string subnet = 4;
+  repeated string service = 5;
+  repeated NetworkPolicy policy = 6;
+}
+
+message NetworkService {
+  enum Type {
+    Firewall = 1;
+    DNS = 2;
+    L4LB = 3;
+    QoS = 4;
+  }
+  required Type type = 1;
+  required string name = 2;
+}
+
+message NetworkPolicy {
+  enum Type {
+    Ingress = 1;
+    Egress = 2;
+  }
+  required Type type = 1;
+  repeated Selector selector = 2;
+  repeated Port port = 3;
+}
+
+message Selector {
+  enum Type {
+    VirtualNetwork = 1;
+    Task = 2;
+  }
+  required Type type = 1;
+  required string matcher = 2;
+}
+
+message Port {
+  required string protocol = 1;
+  required int port = 2;
+}
+
+message NetworkDriver {
+  // We need some more fields here
+  required string name = 1;
+}

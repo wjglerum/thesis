@@ -17,7 +17,7 @@ Instead of extending the \gls{cni} specification we decided to build a \gls{poc}
 \label{subsec:network-object-model}
 The network object model contains different properties for defining networks in \gls{dcos}. The specification for this model can be found in Listing~\ref{lst:nom} and is writtend in Protocol buffers format. We explain the basic idea for each component. Note: this is a first version and can be evolved over time.
 
-\lstinputlisting[label={lst:nom},caption={Network Object Model in Protocol buffers format},language=protobuf2,style=protobuf]{code/networkobject.proto}
+\lstinputlisting[label={lst:nom},caption={Network Object Model in Protocol buffers format},language=protobuf2,style=protobuf]{code/dcos_network_objects_v0.1.proto}
 
 \begin{itemize}
     \item[\textbf{Virtual Network}] Specifies the basic properties of a network. Containing the name and subnet of a virtual network.
@@ -43,18 +43,31 @@ The system is based on the idea of the kube-apiserver from Kubernetes as discuss
 
 \subsection{PoC Architecture}
 \label{subsec:poc-architecture}
-We want to show a basic \gls{poc} with a limited set of features where an operator can see and configure security policies for a given container on a virtual network. Showing the available networks can be easily achieved with this new \gls{api} in place, however creating virtual networks is more difficult. To create a virtual network on demand we would have to distribute the plugin and its configuration to every node, configure and restart every agent in the cluster, which would requires a custom build solution to achieve. Mesosphere is working on providing a system to distribute files to nodes for container volume mounts, which we could later use to distribute network specific files to every node.
+We want to show a basic \gls{poc} with a limited set of features where an operator can see and configure network policies for a given container on a virtual network. Showing the available networks can be easily achieved with this new \gls{api} in place, however creating virtual networks is more difficult. To create a virtual network on demand we would have to distribute the plugin and its configuration to every node, configure and restart every agent in the cluster, which would requires a custom build solution to achieve. Mesosphere is working on providing a system to distribute files to nodes for container volume mounts, which we could later use to distribute network specific files to every node.
 
 Mesosphere recently added support for running Kubernetes on a \gls{dcos} cluster. We reuse the kube-apiserver with \glspl{crd} to submit and query network objects to be stored in etcd. A \gls{crd} is a custom object that works the same as other objects used by the kube-apiserver explained in Section~\ref{subsec:kubernetes}. This saves us from the burden of writing our own API server and setting it up manually on the masters. The kube-apiserver runs as a single container however it depends on other Kubernetes components such as etcd to store information. Instead of trying to strip the kube-apiserver from Kubernetes components, we run an entire Kubernetes cluster on our \gls{dcos} cluster. This does cause some overhead, but we are still able to run a full cluster on a single Macbook Pro 2018 with 16GB of RAM. It did took some time to tune the CPU and memory usage to allow it to run on a single developer machine. For a production ready solution we should implement both the \gls{api} server and storage to run on the masters as discussed in Section~\ref{subsec:system-design}.
 
 Next we created a custom controller written in GoLang\cite{golang} based on one of the examples provided by Kubernetes for dealing with \glspl{crd}. This controller listens to the updates on the kube-apiserver of a specific \gls{crd}. With a custom Dockerfile we can build a Docker container and run it on the \gls{dcos} cluster with Marathon. We connect it to the kube-apiserver allowing us to rapidly prototype and try out new queries for our network objects. The only difficulty is getting the configuration and credentials for access to the Kubernetes cluster in our custom controller. Luckily Marathon has support for volume mounts, so we can generate the configuration file once on the host allowing the container to read it from the volume mount to connect to the Kubernetes cluster.
 
-When we submit a \gls{crd} containing a network object with security policies to the kube-apiserver, our custom controller listens for those events. Currently we support get and delete commands, updates are handled as a delete and create action to simplify the code base. In the case of an add command the controller checks which driver it is using, in our case only Project Calico is supported for now, and uses that plugin to create the network policies. In case of a delete command the controller removes the policy using the plugin. The state of the network policy is saved by the kube-apiserver in etcd and can be queried using the kubectl command from Kubernetes. Listing~\ref{lst:deploy} lists the step to to deploy all the components of this \gls{poc}, the addition JSON configuration files can be found online\footnote{\url{https://github.com/wjglerum/kube-crd}}. Once the stack is up and running we can inspect the logs of the custom controller and interact with it using kubectl from your local machine. In short we use the following components for this \gls{poc}:
+When we submit a \gls{crd} containing a network object with network policies to the kube-apiserver, our custom controller listens for those events, see Figure~\ref{fig:custrom-controller-sequence-diagram}. Currently we support create, delete and list commands, updates are handled as a delete and create action to simplify the code base. In the case of an add command the controller checks which driver it is using, in our case only Project Calico is supported for now, and uses that plugin to create the network policies. In case of a delete command the controller removes the policy using the plugin. The state of the network policy is saved by the kube-apiserver in etcd and can be queried using the kubectl command from Kubernetes. Listing~\ref{lst:deploy} lists the step to to deploy all the components of this \gls{poc}, the addition JSON configuration files can be found online\footnote{\url{https://github.com/wjglerum/kube-crd}}. 
+\lstinputlisting[label={lst:deploy},caption={Steps to deploy the PoC},language=bash]{code/deploy.sh}
+Once the stack is up and running we can inspect the logs of the custom controller and interact with it using kubectl from the local machine. In short we use the following components for this \gls{poc} which are visualised in Figure~\ref{fig:poc-stack}:
 \begin{itemize}
     \item Local \gls{dcos} cluster running in VirtualBox\cite{virtualbox} using Vagrant\cite{vagrant},
     \item Kubernetes as a framework on \gls{dcos}, utilising the kube-apiserver with etcd to store our network objects,
-    \item Custom controller listening for events and integrates with the Calico plugin.
+    \item Custom controller listening for events and integrates with the Calico \gls{api}.
 \end{itemize}
-\todo[inline]{insert diagram of system design}
 
-\lstinputlisting[label={lst:deploy},caption={Steps to deploy the PoC},language=bash]{code/deploy.sh}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\columnwidth]{images/customer-controller-sequence-diagram}
+    \caption{Sequence diagram for the custom controller}
+    \label{fig:custrom-controller-sequence-diagram}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\columnwidth]{images/poc-stack}
+    \caption{Technology stack of the proof of concept}
+    \label{fig:poc-stack}
+\end{figure}
