@@ -11,7 +11,7 @@ We decided not to touch the CNI specification for this thesis, as it would have 
 
 \section{Network Object API}
 \label{sec:networkobject-api}
-Instead of extending the \gls{cni} specification we decided to build a \gls{poc} for a new system in \gls{dcos}. A central \gls{api} in DC/OS for managing components related to virtual container network. We introduce a network object model. In this model an operator can define a network object with the relevant configuration for a network, very much like the objects used in the kube-apiserver. First we explain the model in Section~\ref{subsec:network-object-model}, next the global system design and features in Section~\ref{subsec:system-design} and we conclude with the implemented \gls{poc} in Section~\ref{subsec:poc-architecture}.
+Instead of extending the \gls{cni} specification we decided to build a \gls{poc} for a new system in \gls{dcos}. A central \gls{api} in DC/OS for managing components related to virtual container network. We introduce a network object model. In this model an operator can define a network object with the relevant configuration for a network, much like the objects used in the kube-apiserver. First we explain the model in Section~\ref{subsec:network-object-model}, next the global system design and features in Section~\ref{subsec:system-design} and we conclude with the implemented \gls{poc} in Section~\ref{subsec:poc-architecture}.
 
 \subsection{Network Object Model}
 \label{subsec:network-object-model}
@@ -49,14 +49,14 @@ Mesosphere recently added support for running Kubernetes on a \gls{dcos} cluster
 
 Next we created a custom controller written in GoLang\cite{golang} based on one of the examples provided by Kubernetes for dealing with \glspl{crd}. This controller listens to the updates on the kube-apiserver of a specific \gls{crd}. With a custom Dockerfile we can build a Docker container and run it on the \gls{dcos} cluster with Marathon. We connect it to the kube-apiserver allowing us to rapidly prototype and try out new queries for our network objects. The only difficulty is getting the configuration and credentials for access to the Kubernetes cluster in our custom controller. Luckily Marathon has support for volume mounts, so we can generate the configuration file once on the host allowing the container to read it from the volume mount to connect to the Kubernetes cluster.
 
-\begin{figure}[ht]
+\begin{figure}
     \centering
     \includegraphics[width=0.7\columnwidth]{images/customer-controller-sequence-diagram}
     \caption{Sequence diagram for the custom controller}
     \label{fig:custrom-controller-sequence-diagram}
 \end{figure}
 
-When we submit a \gls{crd} containing a network object with network policies to the kube-apiserver, our custom controller listens for those events, see Figure~\ref{fig:custrom-controller-sequence-diagram}. Currently we support create, delete and list commands, updates are handled as a delete and create action to simplify the code base. In the case of an add command the controller checks which driver it is using, in our case only Project Calico is supported for now, and uses that plugin to create the network policies. In case of a delete command the controller removes the policy using the plugin. The state of the network policy is saved by the kube-apiserver in etcd and can be queried using the kubectl command from Kubernetes. Listing~\ref{lst:deploy} lists the step to to deploy all the components of this \gls{poc}, the addition JSON configuration files can be found online in the before mentioned repository. 
+When we submit a \gls{crd} containing a network object with network policies to the kube-apiserver, our custom controller listens for those events, see Figure~\ref{fig:custrom-controller-sequence-diagram}. Currently we support create, delete and list commands, updates are handled as a delete and create action to simplify the code base. In the case of an add command the controller checks which driver it is using, in our case only Project Calico is supported for now, and uses that plugin to create the network policies. In case of a delete command the controller removes the policy using the plugin. The state of the network policy is saved by the kube-apiserver in etcd and can be queried using the kubectl command from Kubernetes. Listing~\ref{lst:deploy} lists the step to deploy all the components of this \gls{poc}, the addition JSON configuration files can be found online in the before mentioned repository. 
 \lstinputlisting[label={lst:deploy},caption={Steps to deploy the PoC},language=bash]{code/deploy.sh}
 Once the stack is up and running we can inspect the logs of the custom controller to see what is happening and interact with it using kubectl from our local machine. In short we use the following components for this \gls{poc}, visualised in Figure~\ref{fig:poc-stack}:
 \begin{itemize}
@@ -64,7 +64,6 @@ Once the stack is up and running we can inspect the logs of the custom controlle
     \item Kubernetes as a framework on \gls{dcos}, utilising the kube-apiserver with etcd to store our network objects,
     \item Custom controller listening for events and integrates with the Calico \gls{api}.
 \end{itemize}
-
 
 \begin{figure}
     \centering

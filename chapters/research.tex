@@ -62,7 +62,7 @@ This makes it confusing for developers who want to deploy their applications. Co
 
 There is also a problem with the different types of \gls{dns} providers within \gls{dcos}. The mesos-dns component provides a \gls{fqdn} to every service with the following structure: \texttt{<service-name>.<group-name>.<framework-name>.mesos}. This domain name however returns the IP address of the host of the container. In the case that the container is running on a virtual network it will return the wrong IP address. A connection is not possible because the port is only in use on the container network interface, resulting in a time-out for a user request. It is possible with a non recommended workaround to instruct Mesos to return the container IP address instead of the host IP address\cite{mesos_workaround}. The other and newer \gls{dns} provider is dcos-dns providing different addresses based on the network type of the container, these entries are summarised in Table~\ref{tab:dcos-dns} together with the mesos-dns.
 
-\begin{table}[h!]
+\begin{table}[ht]
 \centering
 \begin{tabular}{l l l} 
  \textbf{DNS name} & \textbf{Container IP} & \textbf{Host IP} \\
@@ -95,7 +95,7 @@ To connect to a pod, from another pod or externally through a load balancer, we 
 \label{sec:problems}
 In the first section of this chapter we showed that operators can choose to launch a container on a virtual network provided by \gls{dcos}. Using the default overlay network, operators can select the network from the web interface as \gls{dcos} is aware of the networks that have been created with the overlay module. However this is not the case with virtual networks provided by \gls{cni} plugins. Table~\ref{tab:problems} gives an overview of the virtual network related features available in \gls{dcos} and Kubernetes. As you can see Kubernetes does provide most of the features already as it stores the network state with the kube-apiserver.
 
-\begin{table}[ht]
+\begin{table}
 \centering
 \renewcommand*{\arraystretch}{1.4}
 \begin{tabular}{|p{4cm}|p{2.5cm}|p{4cm}|p{2.5cm}|}\hline 
