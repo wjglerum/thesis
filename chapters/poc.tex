@@ -49,9 +49,9 @@ Mesosphere recently added support for running Kubernetes on a \gls{dcos} cluster
 
 Next we created a custom controller written in GoLang\cite{golang} based on one of the examples provided by Kubernetes for dealing with \glspl{crd}. This controller listens to the updates on the kube-apiserver of a specific \gls{crd}. With a custom Dockerfile we can build a Docker container and run it on the \gls{dcos} cluster with Marathon. We connect it to the kube-apiserver allowing us to rapidly prototype and try out new queries for our network objects. The only difficulty is getting the configuration and credentials for access to the Kubernetes cluster in our custom controller. Luckily Marathon has support for volume mounts, so we can generate the configuration file once on the host allowing the container to read it from the volume mount to connect to the Kubernetes cluster.
 
-\begin{figure}
+\begin{figure}[ht]
     \centering
-    \includegraphics[width=0.75\columnwidth]{images/customer-controller-sequence-diagram}
+    \includegraphics[width=0.7\columnwidth]{images/customer-controller-sequence-diagram}
     \caption{Sequence diagram for the custom controller}
     \label{fig:custrom-controller-sequence-diagram}
 \end{figure}
