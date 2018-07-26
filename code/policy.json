@@ -1,4 +1,4 @@
-"securityPolicies": [
+"networkPolicies": [
     {
         "name": "test-policy",
         "ports": [

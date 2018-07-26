@@ -1,11 +1,11 @@
 \chapter{Problems with Virtual Container Networks}
 \label{chap:research}
 %\emph{This chapter reports on the execution of the research method as described in an earlier chapter. If the research has been divided into phases, they are introduced, reported on and concluded individually. If needed, this chapter could be split up to balance out the sizes of all chapters.}
- First we explain which features are required by operators to manage virtual networks in Section~\ref{sec:required-features}, secondly we explain the current difficulties with managing virtual networks on \gls{dcos} in Section~\ref{sec:current-state}. Next we explain the approach taken by another popular container orchestration platform, Kubernetes, to handle virtual networks in Section~\ref{sec:k8s-virtual-networks}. To finish we provide an overview of the problems at the end of this chapter in Section~\ref{sec:problems}.
+ First we list the features are required by operators to manage virtual networks in Section~\ref{sec:required-features}, secondly we explain the current difficulties with managing virtual networks on \gls{dcos} in Section~\ref{sec:current-state}. Next we present the approach taken by another popular container orchestration platform, Kubernetes, to handle virtual networks in Section~\ref{sec:k8s-virtual-networks}. To finish we provide an overview of the problems at the end of this chapter in Section~\ref{sec:problems}.
 
 \section{Required features}
 \label{sec:required-features}
-We came up with a list of required features that an operator should be able to execute to manage virtual networks and policies on a container orchestration platform. Below is list of the features with an accompanying explanation from the viewpoint of an operator of the cluster. As an operator I want to:
+We came up with a list of required features that an operator should be able to execute to manage virtual networks and policies on a container orchestration platform. Below is the list of the features with an accompanying explanation from the viewpoint of an operator of the cluster. As an operator I want to:
 \begin{itemize}
     \item[\textit{list virtual networks:}] to see which networks are available in my cluster and see properties such as the name, tags, subnets and available IP addresses.
     \item[\textit{select virtual network:}] to select a virtual network to launch my workload on.
@@ -65,7 +65,7 @@ There is also a problem with the different types of \gls{dns} providers within \
 \begin{table}[h!]
 \centering
 \begin{tabular}{l l l} 
- \textbf{DNS name} & C\textbf{ontainer IP} & \textbf{Host IP} \\
+ \textbf{DNS name} & \textbf{Container IP} & \textbf{Host IP} \\
  \hline\hline
  \texttt{*.autoip.dcos.thisdcos.directory} & Container networking & Host or bridge networking \\ 
  \texttt{*.agentip.dcos.thisdcos.directory} & & \checkmark \\
@@ -93,7 +93,7 @@ To connect to a pod, from another pod or externally through a load balancer, we 
 
 \section{Problems with virtual networks on DC/OS}
 \label{sec:problems}
-In the first section of this chapter we showed that operators can chose to launch a container on a virtual network provided by \gls{dcos}. Using the default overlay network operators can select the network from the web interface as \gls{dcos} is aware of the networks that have been created with the overlay module. However this is not the case with virtual networks provided by \gls{cni} plugins. Table~\ref{tab:problems} gives an overview of the virtual network related features available in \gls{dcos} and Kubernetes. As you can see Kubernetes does provide most of the features already as it stores the network state with the kube-apiserver.
+In the first section of this chapter we showed that operators can choose to launch a container on a virtual network provided by \gls{dcos}. Using the default overlay network, operators can select the network from the web interface as \gls{dcos} is aware of the networks that have been created with the overlay module. However this is not the case with virtual networks provided by \gls{cni} plugins. Table~\ref{tab:problems} gives an overview of the virtual network related features available in \gls{dcos} and Kubernetes. As you can see Kubernetes does provide most of the features already as it stores the network state with the kube-apiserver.
 
 \begin{table}[ht]
 \centering
