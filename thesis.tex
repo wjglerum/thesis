@@ -19,7 +19,7 @@
 \usepackage{hyperref}
 \usepackage[toc,acronym,nogroupskip,nohypertypes={acronym}]{glossaries}
 \usepackage{subcaption}
-
+\hypersetup{pdfstartview={XYZ null null null}}
 \colorlet{shadecolor}{yellow}
 
 %Title page
@@ -34,15 +34,17 @@
 \coverpic[200pt]{images/virtual.png}
 
 \abstract{
-\todo[inline]{Fill abstract}
-  This section summarises the content of the thesis for potential readers who do not have time to read it whole,  or for those undecided whether to read it at all. Sum up the following aspects:
+Developers use containers to deploy their applications highly available on container orchestration platforms. On Mesosphere DC/OS it is possible to isolate services with virtual container networks and network policies provided by CNI plugins. Isolation is often needed for privacy and security concerns and for separating different tenants on the platform. At the time of writing, there is no method in place to centrally manage virtual networks and network policies on DC/OS.
 
-  \begin{itemize}
-    \item relevance and motivation for the research
-    \item research questions and a brief description of the research method
-    \item results, contributions and conclusions
-  \end{itemize}
+The goal of this thesis is to understand the current problems in managing virtual container networks on DC/OS and to propose solutions to these problems. To do this, the study first gives background information on the used technologies to be able to identify the current problems. Based on this study, a proof of concept is presented. It is able to centrally manage network policies for different vendors.
+
+The solution proposed in this thesis shows that it is possible to improve the management of virtual networks without a radical change in the architecture of DC/OS. Operators are now able to retrieve the current state of applied network policies and adjust them as needed.
 }
+
+%This section summarises the content of the thesis for potential readers who do not have time to read it whole,  or for those undecided whether to read it at all. Sum up the following aspects:
+%    \item relevance and motivation for the research
+%    \item research questions and a brief description of the research method
+%    \item results, contributions and conclusions
 
 %Styles for the lstlisting blocks.
 %\input{lststyles}
@@ -78,7 +80,5 @@
 
 \appendix
 \glsresetall 
-
-%\include{appendices/model}
 
 \end{document}
