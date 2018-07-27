@@ -34,11 +34,11 @@
 \coverpic[200pt]{images/virtual.png}
 
 \abstract{
-Developers use containers to deploy their applications highly available on container orchestration platforms. On Mesosphere DC/OS it is possible to isolate services with virtual container networks and network policies provided by CNI plugins. Isolation is often needed for privacy and security concerns and for separating different tenants on the platform. At the moment there is no method in place to centrally manage virtual networks and network policies on DC/OS.
+Developers use containers to deploy their applications highly available on container orchestration platforms. On Mesosphere DC/OS it is possible to isolate services with virtual container networks and network policies provided by CNI plugins. Isolation is often needed for privacy and security concerns and for separating different tenants on the platform. At the time of writing, there is no method in place to centrally manage virtual networks and network policies on DC/OS.
 
-The goal of this thesis is to find out what the current problems are in managing virtual container networks on DC/OS and how to improve the found problems. To do this, the study first gives background information on the used technologies are to be able to identify the current problems. Next a proof of concept was created that is able to centrally manage network policies for different vendors.
+The goal of this thesis is to understand the current problems in managing virtual container networks on DC/OS and to propose solutions to these problems. To do this, the study first gives background information on the used technologies to be able to identify the current problems. Based on this study, a proof of concept is presented. It is able to centrally manage network policies for different vendors.
 
-The developed solution showed that it is indeed possible to improve the management of virtual networks. Operators are now able to retrieve the current state of applied network policies and adjust them as needed.
+The solution proposed in this thesis shows that it is possible to improve the management of virtual networks without a radical change in the architecture of DC/OS. Operators are now able to retrieve the current state of applied network policies and adjust them as needed.
 }
 
 %This section summarises the content of the thesis for potential readers who do not have time to read it whole,  or for those undecided whether to read it at all. Sum up the following aspects:
@@ -80,7 +80,5 @@ The developed solution showed that it is indeed possible to improve the manageme
 
 \appendix
 \glsresetall 
-
-%\include{appendices/model}
 
 \end{document}
