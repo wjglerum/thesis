@@ -1,0 +1,28 @@
+[
+  {
+    "kind": "policy",
+    "apiVersion": "v1",
+    "metadata": {
+      "name": "test-policy"
+    },
+    "spec": {
+      "ingress": [
+        {
+          "action": "deny",
+          "protocol": "tcp",
+          "source": {},
+          "destination": {
+            "ports": [
+              80
+            ]
+          }
+	}
+      ],
+      "selector": "role == 'webserver'",
+      "types": [
+        "ingress"
+      ]
+    }
+  }
+]
+
